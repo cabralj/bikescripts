@@ -14,6 +14,15 @@ puts "\t" + urla
 agent = Mechanize.new
 agent.user_agent_alias = 'Mac Safari'
 
+
+
+##############################################################
+#
+# =>   BikePedia
+#
+##############################################################
+
+
 page = agent.get(urla)
 
 result = page.at('#ctl00_MainContent_searchCountLabel').text.strip
@@ -37,10 +46,6 @@ if result.to_i > 0
 		# Save the image with the Part Number as the File Name
 		agent.get(image).save "data/"+fid+".jpg"
 		puts "\tSaved Image .. " + image
-
-
-
-
 
 		# Extract key data from page
 		year  = detail.at('#ctl00_MainContent_TitleOfBike_yearLabel2').text.strip
@@ -78,6 +83,13 @@ if result.to_i > 0
 
 
 	else
+
+		##############################################################
+		#
+		# =>   Bikepedia Detail Page
+		#
+		##############################################################
+
 		puts "\tEmpty Detail Page"
 		
 		image = page.at('#ctl00_MainContent_searchResultsListView_ctrl0_Image1').attributes['src'].to_s
@@ -131,6 +143,13 @@ if result.to_i > 0
 	end
 
 else
+
+	##############################################################
+	#
+	# =>   Bike Habitat
+	#
+	##############################################################
+
 	puts "\tNot Found"
 	puts "Checking bicyclehabitat.com"
 	habitat = agent.get(urlb)
@@ -138,32 +157,33 @@ else
 	puts "\t" + urlb
 	
 	if habitat.body.include? '1 Results'
-		puts "\tFound 1"
+		puts "Found 1"
 		link = habitat.at(".seitempicture a").attributes['href']
-		puts "\t" + link
+		puts "link"
 
 		detail = agent.get(link)
 
 		# Find and Save Image
 		image = detail.at('.meta link').attributes['href']
-		image = "\thttp://bicyclehabitat.com" + image.to_s
+		image = "http://bicyclehabitat.com" + image.to_s
 		image.sub! '/large/', '/zoom/'
 		agent.get(image).save "data/"+fid+".jpg"
-		puts "\tSaved Image .. " + image
 
-		puts "\t" + detail.title
+		puts "Saved Image .. " + image
+
+		puts "title = " + detail.title
 	
 		year = detail.at('.semodelyear').text.strip
-		puts "\tyear = " + year
+		puts "year = " + year
 
 		brand = detail.at('#seitemcontent h1').text.strip
-		puts "\tbrand = " + brand
+		puts "brand = " + brand
 
 		model = detail.at('#seitemcontent h2').text.strip
-		puts "\tmodel = " + model
+		puts "model = " + model
 		
 		price = detail.at('.seoriginalprice').text.strip
-		puts "\tprice = " + price
+		puts "price = " + price
 
 
 		# Create a file with the Part Number as the File name
@@ -194,9 +214,15 @@ else
 		file.puts("price = " + price)
 		file.puts("link = " + detail.uri.to_s)
 		file.close
-		puts "\tSaved Data ... " + filename
+		puts "Saved Data ... " + filename
 
 	else
+
+		##############################################################
+		#
+		# =>   Manual Entry
+		#
+		##############################################################
 
 		# Create a file with the Store Number as the File name
 		filename = "data/"+fid+".txt"
@@ -233,12 +259,15 @@ else
 		price = [(print 'Price: '), STDIN.gets.rstrip][1]
 		file.puts("price = " + price.to_s)
 
-		file.puts("link = -")
+		link = [(print 'Link: '), STDIN.gets.rstrip][1]
+		file.puts("link = " + link.to_s)
+
 		file.close
-		puts "\tSaved Data ... " + filename
+		puts "Saved Data ... " + filename
 
 
 	end
 
-	
+	# http://agees.com/sitesearch.cfm?search=791964420347&goSiteSearch.x=0&goSiteSearch.y=0
+
 end
